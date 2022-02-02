@@ -1,9 +1,14 @@
+"""
+Example:
+    python kakaotalk_parser.py talk_log.txt > talk_stats.txt
+    python kakaotalk_parser.py --src_encoding=cp949 talk_log.txt > talk_stats.txt
+"""
 import argparse
-import pprint
 import re
 
 parser = argparse.ArgumentParser(description='kakaotalk stat collect')
 parser.add_argument('infile', type=str)
+parser.add_argument('--src_encoding', default='utf-8')
 
 date = re.compile('^\d+년 \d+월 \d+일 \w+요일$')
 chat = re.compile('^\d+/\d+/\d+ \w+ \d+:\d+, .*')
@@ -21,7 +26,7 @@ if __name__ == '__main__':
 
     title = None
     timestamp = None
-    with open(filepath, 'r') as f:
+    with open(filepath, 'r', encoding=args.src_encoding) as f:
         lineno = 0
         user = ''
         text = ''
@@ -35,6 +40,7 @@ if __name__ == '__main__':
             else:
                 if (re.match(date, line) is not None):
                     if (daily_db is not None):
+                        # display current daily stats
                         print_stats(daily_db)
                     # log start date
                     print(line)
@@ -53,6 +59,7 @@ if __name__ == '__main__':
                     text = text + line
 
             lineno += 1
+    # print last daily stats
     print_stats(daily_db)
 
     print("Summary", timestamp)
